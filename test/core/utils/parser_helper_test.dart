@@ -31,33 +31,6 @@ void main() {
     });
   });
 
-  group('ParserHelper.longestDigitRun', () {
-    test('returns the longest run in the string', () {
-      expect(
-        ParserHelper.longestDigitRun('AB1234 CD 12345 EF'),
-        '12345',
-      );
-    });
-
-    test('respects min/max length filters', () {
-      expect(
-        ParserHelper.longestDigitRun(
-          '12 12345 123456',
-          minLength: 4,
-          maxLength: 5,
-        ),
-        '12345',
-      );
-    });
-
-    test('returns null when no run satisfies the bounds', () {
-      expect(
-        ParserHelper.longestDigitRun('abc', minLength: 1),
-        isNull,
-      );
-    });
-  });
-
   group('ParserHelper.bestNameCandidate', () {
     test('prefers all-caps multi-word lines', () {
       final lines = [

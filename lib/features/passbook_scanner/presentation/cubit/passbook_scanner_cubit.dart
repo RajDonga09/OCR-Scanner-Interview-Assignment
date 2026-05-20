@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/services/image_service.dart';
 import '../../../../core/utils/logger.dart';
@@ -37,6 +37,8 @@ class PassbookScannerCubit extends Cubit<PassbookScannerState> {
         rawText: result.rawText,
         clearError: true,
       ));
+    } on PassbookScanCropCancelledFailure {
+      emit(PassbookScannerState.initial());
     } on PassbookScanFailure catch (e) {
       AppLogger.error('Passbook scan failed', error: e);
       emit(state.copyWith(

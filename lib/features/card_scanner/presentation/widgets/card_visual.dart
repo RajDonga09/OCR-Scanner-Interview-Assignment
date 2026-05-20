@@ -6,8 +6,6 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../domain/models/card_details.dart';
 
-/// Decorative card visual that renders the parsed card details on top of a
-/// gradient, similar to how a digital wallet displays a saved card.
 class CardVisual extends StatelessWidget {
   const CardVisual({super.key, required this.details});
 

@@ -7,8 +7,6 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_spacing.dart';
 import '../../../../core/widgets/app_text.dart';
 
-/// Reusable expandable view of the raw OCR text — used by both result screens
-/// (cards and passbooks) so the heuristic decisions are auditable.
 class RawTextView extends StatefulWidget {
   const RawTextView({super.key, required this.text});
 

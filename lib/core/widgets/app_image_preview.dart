@@ -6,9 +6,6 @@ import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 import 'app_text.dart';
 
-/// Renders a scanned image inside a rounded card.
-///
-/// Falls back to an empty placeholder when [file] is null.
 class AppImagePreview extends StatelessWidget {
   const AppImagePreview({
     super.key,

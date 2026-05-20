@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 
-/// A surface card with consistent padding, radius and border.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,

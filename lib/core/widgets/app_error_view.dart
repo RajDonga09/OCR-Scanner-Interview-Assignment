@@ -6,7 +6,6 @@ import '../constants/app_strings.dart';
 import 'app_button.dart';
 import 'app_text.dart';
 
-/// Reusable empty-state container for error situations.
 class AppErrorView extends StatelessWidget {
   const AppErrorView({
     super.key,

@@ -4,7 +4,6 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_spacing.dart';
 
-/// Two-button action area used by the card scanner home view.
 class CardScannerActions extends StatelessWidget {
   const CardScannerActions({
     super.key,

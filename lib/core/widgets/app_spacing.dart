@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_dimensions.dart';
 
-/// Tiny helpers that replace ad-hoc `SizedBox(height: …)` calls scattered
-/// across the codebase.
 class AppSpacing {
   const AppSpacing._();
 

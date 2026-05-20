@@ -6,7 +6,6 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_empty_view.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_image_preview.dart';
 import '../../../../core/widgets/app_loader.dart';
@@ -115,13 +114,13 @@ class _CardScannerView extends StatelessWidget {
                   file: null,
                   placeholderLabel: 'Tap a button below to start',
                 ),
-                AppSpacing.v24,
-                const AppEmptyView(
-                  title: AppStrings.emptyTitle,
-                  message:
-                      'Scan a credit or debit card to extract its number, holder name and expiry date.',
-                  icon: Icons.credit_score_rounded,
-                ),
+                // AppSpacing.v24,
+                // const AppEmptyView(
+                //   title: AppStrings.emptyTitle,
+                //   message:
+                //       'Scan a credit or debit card to extract its number, holder name and expiry date.',
+                //   icon: Icons.credit_score_rounded,
+                // ),
               ],
             ),
           ),

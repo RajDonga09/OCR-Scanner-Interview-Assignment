@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_dimensions.dart';
 
-/// Thin wrapper around [TextField] that consumes the project's
-/// `inputDecorationTheme` and exposes a more concise API.
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,

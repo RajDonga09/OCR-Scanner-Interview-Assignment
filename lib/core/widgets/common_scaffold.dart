@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_dimensions.dart';
 
-/// A simple scaffold wrapper enforcing consistent paddings and app-bar style
-/// across every screen of the app.
 class CommonScaffold extends StatelessWidget {
   const CommonScaffold({
     super.key,

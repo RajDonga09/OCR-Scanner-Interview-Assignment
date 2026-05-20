@@ -31,7 +31,7 @@ The project is deliberately built to interview-grade standards: clean architectu
 | ------------ | ------- |
 | State        | `flutter_bloc`, `bloc`, `equatable` |
 | DI           | `get_it` |
-| Image input  | `image_picker`, `camera` |
+| Image input  | `image_picker`, `image_cropper` |
 | OCR          | `google_mlkit_text_recognition` |
 | Permissions  | `permission_handler` |
 | Testing      | `flutter_test`, `bloc_test`, `mocktail` |
@@ -145,15 +145,16 @@ All dependencies are wired in `lib/core/di/injection.dart` using `get_it` — fe
 ## OCR pipeline
 
 1. **Pick image** via `ImageService` (camera or gallery → `dart:io.File`).
-2. **Request permissions** through `PermissionService` (Android 13 photos + legacy storage fallback).
-3. **Extract raw text** with `MlKitOcrService` (`google_mlkit_text_recognition`).
-4. **Normalise text** with `TextCleaner.clean`:
+2. **Crop** with `ImageCropService` (card or passbook aspect ratio) to exclude side text.
+3. **Request permissions** through `PermissionService`.
+4. **Extract raw text** with `MlKitOcrService` (`google_mlkit_text_recognition`).
+5. **Normalise text** with `TextCleaner.clean`:
    - Strip non-alphanumeric noise (`★ # @ …`)
    - Collapse multi-space runs
    - Drop duplicate lines (case-insensitive)
-5. **Parse** with the feature parser (`CardParser` or `PassbookParser`).
-6. **Validate** with `LuhnValidator` (cards) and the IFSC regex (passbooks).
-7. **Emit success** with a typed model + the cleaned raw text (kept for the UI's "Raw OCR Text" debug panel).
+6. **Parse** with the feature parser (`CardParser` or `PassbookParser`).
+7. **Validate** with `LuhnValidator` (cards) and the IFSC regex (passbooks).
+8. **Emit success** with a typed model + cleaned raw text for the result screen.
 
 The OCR confusable map (O↔0, I↔1, S↔5, …) is **only applied inside numeric contexts** so we never mangle a name. Inside an IFSC token the mapping is reversed (digits become letters in positions 0-3, `0` is forced at position 4).
 

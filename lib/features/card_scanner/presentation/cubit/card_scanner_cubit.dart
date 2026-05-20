@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/services/image_service.dart';
 import '../../../../core/utils/logger.dart';
@@ -10,11 +10,6 @@ import '../../domain/repositories/card_scanner_repository.dart';
 
 part 'card_scanner_state.dart';
 
-/// Cubit that owns the lifecycle of a single card scan.
-///
-/// The cubit is intentionally tiny — all parsing/IO logic lives in
-/// [CardScannerRepository]. That separation keeps the cubit purely a state
-/// machine that is trivial to test with `bloc_test`.
 class CardScannerCubit extends Cubit<CardScannerState> {
   CardScannerCubit({required this.repository})
       : super(CardScannerState.initial());
@@ -42,6 +37,8 @@ class CardScannerCubit extends Cubit<CardScannerState> {
         rawText: result.rawText,
         clearError: true,
       ));
+    } on CardScanCropCancelledFailure {
+      emit(CardScannerState.initial());
     } on CardScanFailure catch (e) {
       AppLogger.error('Card scan failed', error: e);
       emit(state.copyWith(

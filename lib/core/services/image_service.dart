@@ -4,14 +4,8 @@ import 'package:image_picker/image_picker.dart' as picker;
 
 import '../constants/app_constants.dart';
 
-/// Source of an image used by the OCR pipeline.
-///
-/// We declare our own enum and translate to the plugin enum inside the
-/// implementation so feature code is not coupled to `image_picker`.
 enum AppImageSource { camera, gallery }
 
-/// Abstracts away the underlying image-picker so the cubits can be tested
-/// without binding to the real plugin.
 abstract class ImageService {
   Future<File?> pickImage(AppImageSource source);
 }

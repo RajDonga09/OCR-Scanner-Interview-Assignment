@@ -6,7 +6,6 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_spacing.dart';
 import '../../../../core/widgets/app_text.dart';
 
-/// Single tile used on the home screen to launch a scanning flow.
 class HomeFeatureTile extends StatelessWidget {
   const HomeFeatureTile({
     super.key,

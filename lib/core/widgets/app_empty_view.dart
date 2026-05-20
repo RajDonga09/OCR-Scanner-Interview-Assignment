@@ -5,7 +5,6 @@ import '../constants/app_dimensions.dart';
 import '../constants/app_strings.dart';
 import 'app_text.dart';
 
-/// Empty / "nothing scanned yet" placeholder used by the result screens.
 class AppEmptyView extends StatelessWidget {
   const AppEmptyView({
     super.key,

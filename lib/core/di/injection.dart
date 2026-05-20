@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../services/image_crop_service.dart';
 import '../services/image_service.dart';
 import '../services/ocr_service.dart';
 import '../services/permission_service.dart';
@@ -10,31 +11,21 @@ import '../../features/passbook_scanner/domain/parsers/passbook_parser.dart';
 import '../../features/passbook_scanner/domain/repositories/passbook_scanner_repository.dart';
 import '../../features/passbook_scanner/presentation/cubit/passbook_scanner_cubit.dart';
 
-/// Global service locator.
-///
-/// We deliberately keep the wiring inside a single function — registering
-/// dependencies from feature-local `register…()` methods spreads the
-/// composition root around and makes the runtime graph harder to reason
-/// about.
 final GetIt sl = GetIt.instance;
 
 Future<void> configureDependencies() async {
   if (sl.isRegistered<OcrService>()) return;
 
-  // ---------------------------------------------------------------------------
-  // Core services
-  // ---------------------------------------------------------------------------
   sl.registerLazySingleton<PermissionService>(() => const PermissionServiceImpl());
   sl.registerLazySingleton<ImageService>(() => ImageServiceImpl());
+  sl.registerLazySingleton<ImageCropService>(() => const ImageCropServiceImpl());
   sl.registerLazySingleton<OcrService>(() => MlKitOcrService());
 
-  // ---------------------------------------------------------------------------
-  // Card scanner
-  // ---------------------------------------------------------------------------
   sl.registerLazySingleton<CardParser>(() => const CardParser());
   sl.registerLazySingleton<CardScannerRepository>(
     () => CardScannerRepositoryImpl(
       imageService: sl<ImageService>(),
+      imageCropService: sl<ImageCropService>(),
       ocrService: sl<OcrService>(),
       permissionService: sl<PermissionService>(),
       parser: sl<CardParser>(),
@@ -44,13 +35,11 @@ Future<void> configureDependencies() async {
     () => CardScannerCubit(repository: sl<CardScannerRepository>()),
   );
 
-  // ---------------------------------------------------------------------------
-  // Passbook scanner
-  // ---------------------------------------------------------------------------
   sl.registerLazySingleton<PassbookParser>(() => const PassbookParser());
   sl.registerLazySingleton<PassbookScannerRepository>(
     () => PassbookScannerRepositoryImpl(
       imageService: sl<ImageService>(),
+      imageCropService: sl<ImageCropService>(),
       ocrService: sl<OcrService>(),
       permissionService: sl<PermissionService>(),
       parser: sl<PassbookParser>(),
@@ -59,8 +48,4 @@ Future<void> configureDependencies() async {
   sl.registerFactory<PassbookScannerCubit>(
     () => PassbookScannerCubit(repository: sl<PassbookScannerRepository>()),
   );
-}
-
-Future<void> resetDependencies() async {
-  await sl.reset();
 }

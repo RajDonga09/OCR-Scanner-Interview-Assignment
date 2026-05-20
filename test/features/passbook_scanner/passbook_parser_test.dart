@@ -126,6 +126,35 @@ JOHN DOE
     });
   });
 
+  group('PassbookParser.parsePassbook - SBI passbook layout', () {
+    test('extracts customer name, account and IFSC from SBI page', () {
+      final result = parser.parsePassbook('''
+STATE BANK OF INDIA
+CIF No: 89961440164
+Account No: 37150529313
+Customer Name: Mr. SOUMEN RUIDAS
+S/D/W/H/c: BHOLANATH RUIDAS
+Branch Name: KULGACHIA BRANCH
+IFSC: SBIN0001692
+MICR: 700002112
+''');
+      expect(result.accountHolder, 'SOUMEN RUIDAS');
+      expect(result.accountNumber, '37150529313');
+      expect(result.ifsc, 'SBIN0001692');
+      expect(result.isIfscValid, isTrue);
+      expect(result.bankName, contains('STATE BANK'));
+      expect(result.branch, contains('KULGACHIA'));
+    });
+
+    test('does not pick CIF number as account number', () {
+      final result = parser.parsePassbook('''
+CIF No: 89961440164
+Account No: 37150529313
+''');
+      expect(result.accountNumber, '37150529313');
+    });
+  });
+
   group('PassbookParser.parsePassbook - edge cases', () {
     test('handles empty input', () {
       expect(parser.parsePassbook(''), BankDetails.empty());

@@ -1,9 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// High-level card-network classification used to colour the UI.
-///
-/// We classify based solely on the IIN range; the classification has no
-/// effect on parsing accuracy and is purely cosmetic.
 enum CardBrand { visa, masterCard, amex, rupay, discover, unknown }
 
 extension CardBrandX on CardBrand {
@@ -25,7 +21,6 @@ extension CardBrandX on CardBrand {
   }
 }
 
-/// Immutable value type returned by the card parser.
 class CardDetails extends Equatable {
   const CardDetails({
     this.cardNumber,
@@ -38,20 +33,11 @@ class CardDetails extends Equatable {
 
   factory CardDetails.empty() => const CardDetails();
 
-  /// Cleaned digit-only PAN.
   final String? cardNumber;
-
-  /// `XXXX XXXX XXXX 1234` form — never logged but safe to display.
   final String? maskedNumber;
-
-  /// Detected card holder name.
   final String? holderName;
-
-  /// Detected expiry date formatted as `MM/YY`.
   final String? expiry;
-
   final CardBrand brand;
-
   final bool isLuhnValid;
 
   bool get hasData =>

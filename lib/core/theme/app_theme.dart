@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 
-/// Centralised Material 3 [ThemeData] for the app.
-///
-/// Themes are composed from [AppColors] and [AppDimensions] so visual
-/// changes never require touching widgets.
 class AppTheme {
   const AppTheme._();
 
@@ -26,7 +22,6 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      splashFactory: InkRipple.splashFactory,
       textTheme: baseTextTheme.apply(
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,

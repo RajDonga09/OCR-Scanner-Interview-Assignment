@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/services/image_crop_service.dart';
 import '../../../../core/services/image_service.dart';
 import '../../../../core/services/ocr_service.dart';
 import '../../../../core/services/permission_service.dart';
@@ -20,6 +22,10 @@ class PassbookScanPermissionFailure extends PassbookScanFailure {
 
 class PassbookScanNoImageFailure extends PassbookScanFailure {
   const PassbookScanNoImageFailure(super.message);
+}
+
+class PassbookScanCropCancelledFailure extends PassbookScanFailure {
+  const PassbookScanCropCancelledFailure(super.message);
 }
 
 class PassbookScanOcrFailure extends PassbookScanFailure {
@@ -49,12 +55,14 @@ abstract class PassbookScannerRepository {
 class PassbookScannerRepositoryImpl implements PassbookScannerRepository {
   PassbookScannerRepositoryImpl({
     required this.imageService,
+    required this.imageCropService,
     required this.ocrService,
     required this.permissionService,
     required this.parser,
   });
 
   final ImageService imageService;
+  final ImageCropService imageCropService;
   final OcrService ocrService;
   final PermissionService permissionService;
   final PassbookParser parser;
@@ -70,13 +78,21 @@ class PassbookScannerRepositoryImpl implements PassbookScannerRepository {
       );
     }
 
-    final File? image = await imageService.pickImage(source);
-    if (image == null) {
+    final picked = await imageService.pickImage(source);
+    if (picked == null) {
       throw const PassbookScanNoImageFailure('No image was selected.');
     }
 
+    final cropped =
+        await imageCropService.cropImage(picked, CropProfile.passbook);
+    if (cropped == null) {
+      throw const PassbookScanCropCancelledFailure(
+        AppStrings.errorCropCancelled,
+      );
+    }
+
     try {
-      final ocr = await ocrService.extractText(image);
+      final ocr = await ocrService.extractText(cropped);
       final details = parser.parsePassbook(ocr.cleanedText);
 
       if (!details.hasData) {
@@ -86,7 +102,7 @@ class PassbookScannerRepositoryImpl implements PassbookScannerRepository {
       }
 
       return PassbookScanResult(
-        image: image,
+        image: cropped,
         details: details,
         rawText: ocr.cleanedText,
       );

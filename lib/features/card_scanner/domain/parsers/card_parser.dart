@@ -1,26 +1,16 @@
 import '../../../../core/constants/app_regex.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/parser_helper.dart';
 import '../../../../core/utils/text_cleaner.dart';
 import '../../../../core/utils/validators.dart';
 import '../models/card_details.dart';
 import 'luhn_validator.dart';
 
-/// Manually implemented parser that extracts a [CardDetails] from raw OCR
-/// text.
-///
-/// The parser is deliberately **stateless** and **pure**: feeding the same
-/// input always yields the same output. This makes unit testing trivial
-/// (see `test/features/card_scanner/card_parser_test.dart`).
 class CardParser {
   const CardParser({this.luhnValidator = const LuhnValidator()});
 
   final LuhnValidator luhnValidator;
 
-  /// Parses [rawText] (typically the output of [TextCleaner.clean]).
-  ///
-  /// The function is designed to *degrade gracefully* — even if it cannot
-  /// extract a field it will still return a [CardDetails] populated with
-  /// whatever it could find.
   CardDetails parseCard(String rawText) {
     if (rawText.isEmpty) return CardDetails.empty();
 
@@ -51,17 +41,10 @@ class CardParser {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Card number
-  // ---------------------------------------------------------------------------
-
   String? _extractCardNumber(List<String> lines) {
-    // Step 1 — gather every plausible candidate from every line.
     final candidates = <String>{};
 
     for (final line in lines) {
-      // OCR often confuses letters and digits in numeric lines, so apply
-      // the digit-friendly normalisation before extracting candidates.
       final normalised = TextCleaner.normaliseDigits(line);
 
       for (final match in AppRegex.cardNumberLoose.allMatches(normalised)) {
@@ -69,40 +52,28 @@ class CardParser {
         if (Validators.isCardLengthValid(digits)) candidates.add(digits);
       }
 
-      // Some scans break the PAN across multiple short numeric tokens. Try
-      // joining all numeric tokens of the line into a single candidate too.
       final joined = ParserHelper.digitsOnly(normalised);
       if (Validators.isCardLengthValid(joined)) candidates.add(joined);
     }
 
     if (candidates.isEmpty) return null;
 
-    // Step 2 — prefer the candidate that passes the Luhn check.
     final luhnValid = candidates.where(luhnValidator.isValidCard).toList();
     if (luhnValid.isNotEmpty) {
-      // Among Luhn-valid candidates, pick the longest (handles 19-digit cards
-      // that contain a Luhn-valid 16-digit subsequence).
       luhnValid.sort((a, b) => b.length.compareTo(a.length));
       return luhnValid.first;
     }
 
-    // Step 3 — fall back to the longest candidate.
     final ordered = candidates.toList()
       ..sort((a, b) => b.length.compareTo(a.length));
     return ordered.first;
   }
-
-  // ---------------------------------------------------------------------------
-  // Expiry
-  // ---------------------------------------------------------------------------
 
   String? _extractExpiry(List<String> lines) {
     String? fallback;
 
     for (final line in lines) {
       final upper = line.toUpperCase();
-
-      // Lines that explicitly mention VALID THRU / EXP get priority.
       final isExpiryLine = upper.contains('VALID') ||
           upper.contains('THRU') ||
           upper.contains('EXP');
@@ -113,9 +84,6 @@ class CardParser {
       final monthStr = match.group(1)!;
       var yearStr = match.group(2)!;
 
-      // Reject if the candidate is actually part of a longer digit run –
-      // protects against picking up the middle of a card number such as
-      // `4111 1125 2222 …` where `12/52` could otherwise match.
       if (!_looksLikeStandaloneExpiry(line, match)) continue;
 
       if (yearStr.length == 4) yearStr = yearStr.substring(2);
@@ -123,9 +91,6 @@ class CardParser {
       if (!Validators.isExpiryValid(formatted)) continue;
 
       if (isExpiryLine) return formatted;
-
-      // Otherwise keep looking — but remember the candidate to use as a
-      // fallback if no explicit expiry line is found.
       fallback ??= formatted;
     }
     return fallback;
@@ -138,10 +103,6 @@ class CardParser {
     final boundedAfter = after.isEmpty || !RegExp(r'\d').hasMatch(after);
     return boundedBefore && boundedAfter;
   }
-
-  // ---------------------------------------------------------------------------
-  // Holder name
-  // ---------------------------------------------------------------------------
 
   static final _holderExclusions = <RegExp>[
     RegExp(r'\bVISA\b', caseSensitive: false),
@@ -163,18 +124,109 @@ class CardParser {
     RegExp(r'\bGOLD\b', caseSensitive: false),
     RegExp(r'\bSIGNATURE\b', caseSensitive: false),
     RegExp(r'\bINTERNATIONAL\b', caseSensitive: false),
+    RegExp(r'\bSMART\b', caseSensitive: false),
+    RegExp(r'\bCHIP\b', caseSensitive: false),
+    RegExp(r'\bCHIPS\b', caseSensitive: false),
   ];
 
+  static const _holderLabelWords = <String>{
+    'DEBIT',
+    'CREDIT',
+    'CARD',
+    'VALID',
+    'THRU',
+    'FROM',
+    'THROUGH',
+    'MEMBER',
+    'SINCE',
+    'BANK',
+    'VISA',
+    'MASTERCARD',
+    'AMEX',
+    'RUPAY',
+    'DISCOVER',
+    'PLATINUM',
+    'GOLD',
+    'SIGNATURE',
+    'INTERNATIONAL',
+    'AUTHORIZED',
+    'SMART',
+    'CHIP',
+    'CHIPS',
+  };
+
   String? _extractHolderName(List<String> lines) {
+    final fromBottom = _extractHolderFromBottom(lines);
+    if (fromBottom != null) return fromBottom;
+
     return ParserHelper.bestNameCandidate(
       lines,
       exclusions: _holderExclusions,
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Brand detection
-  // ---------------------------------------------------------------------------
+  /// Card holder names sit at the bottom; scan upward and merge split lines.
+  String? _extractHolderFromBottom(List<String> lines) {
+    final parts = <String>[];
+
+    for (var i = lines.length - 1; i >= 0; i--) {
+      final line = lines[i].trim();
+      if (line.isEmpty) {
+        if (parts.isNotEmpty) break;
+        continue;
+      }
+
+      if (RegExp(r'\d').hasMatch(line)) {
+        if (parts.isNotEmpty) break;
+        continue;
+      }
+
+      if (_holderExclusions.any((regex) => regex.hasMatch(line))) {
+        if (parts.isNotEmpty) break;
+        continue;
+      }
+
+      if (!_isHolderNameToken(line)) {
+        if (parts.isNotEmpty) break;
+        continue;
+      }
+
+      parts.insert(0, line);
+      if (parts.length >= 4) break;
+    }
+
+    if (parts.isEmpty) return null;
+
+    final name = parts.join(' ').collapseWhitespace();
+    return _isPlausibleHolderName(name) ? name : null;
+  }
+
+  bool _isHolderNameToken(String line) {
+    final letters = line.replaceAll(RegExp(r'[^A-Za-z]'), '');
+    if (letters.length < 2) return false;
+
+    final tokens = line.split(RegExp(r'\s+')).where((t) => t.isNotEmpty);
+    for (final token in tokens) {
+      if (_holderLabelWords.contains(token.toUpperCase())) return false;
+    }
+    return true;
+  }
+
+  bool _isPlausibleHolderName(String name) {
+    final tokens = name
+        .split(RegExp(r'\s+'))
+        .where((t) => t.isNotEmpty)
+        .toList();
+    if (tokens.isEmpty) return false;
+
+    if (tokens.length >= 2) {
+      return tokens.every((t) => !_holderLabelWords.contains(t.toUpperCase()));
+    }
+
+    final word = tokens.single.toUpperCase();
+    if (_holderLabelWords.contains(word)) return false;
+    return tokens.single.length >= 5;
+  }
 
   CardBrand _detectBrand(String digits) {
     if (digits.startsWith('4')) return CardBrand.visa;

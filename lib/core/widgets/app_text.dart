@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 
-/// Semantic typographic variants for [AppText].
-///
-/// Using a variant enum keeps screens declarative — they describe *what*
-/// the text is, never *how* it should look.
 enum AppTextVariant {
   display,
   title,

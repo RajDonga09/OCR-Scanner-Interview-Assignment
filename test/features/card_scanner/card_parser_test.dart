@@ -112,6 +112,48 @@ VALID THRU 12/25
 ''');
       expect(result.holderName, isNull);
     });
+
+    test('extracts NAME SURNAME from sample debit card layout', () {
+      final result = parser.parseCard('''
+DEBIT CARD
+1234 5678 9101 8765
+09/21
+NAME SURNAME
+''');
+      expect(result.holderName, 'NAME SURNAME');
+    });
+
+    test('ignores Smart Chip label and still extracts holder', () {
+      final result = parser.parseCard('''
+DEBIT CARD
+Smart Chip
+1234 5678 9101 8765
+09/21
+NAME SURNAME
+''');
+      expect(result.holderName, 'NAME SURNAME');
+    });
+
+    test('supports title-case holder names from OCR', () {
+      final result = parser.parseCard('''
+DEBIT CARD
+1234 5678 9101 8765
+09/21
+Name Surname
+''');
+      expect(result.holderName, 'Name Surname');
+    });
+
+    test('merges holder name split across two lines', () {
+      final result = parser.parseCard('''
+DEBIT CARD
+1234 5678 9101 8765
+09/21
+NAME
+SURNAME
+''');
+      expect(result.holderName, 'NAME SURNAME');
+    });
   });
 
   group('CardParser.parseCard - OCR noise resilience', () {

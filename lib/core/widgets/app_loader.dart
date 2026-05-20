@@ -4,8 +4,6 @@ import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 import 'app_text.dart';
 
-/// Centred loader with an optional caption — used by every "loading" state
-/// in the app so the experience is consistent.
 class AppLoader extends StatelessWidget {
   const AppLoader({super.key, this.message});
 

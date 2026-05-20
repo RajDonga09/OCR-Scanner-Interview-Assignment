@@ -1,6 +1,5 @@
 part of 'card_scanner_cubit.dart';
 
-/// Status enum representing the four possible cubit states.
 enum CardScannerStatus { initial, loading, success, failure }
 
 class CardScannerState extends Equatable {
@@ -42,5 +41,6 @@ class CardScannerState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, image?.path, details, rawText, errorMessage];
+  List<Object?> get props =>
+      [status, image?.path, details, rawText, errorMessage];
 }

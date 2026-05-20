@@ -6,8 +6,6 @@ import '../constants/app_dimensions.dart';
 import '../constants/app_strings.dart';
 import 'app_text.dart';
 
-/// A label / value row used on the result screens to display extracted
-/// fields consistently.
 class InfoRow extends StatelessWidget {
   const InfoRow({
     super.key,
