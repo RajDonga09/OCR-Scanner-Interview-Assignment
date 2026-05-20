@@ -10,7 +10,7 @@ Built to demonstrate production-minded Flutter work: clean architecture, feature
 
 Install and try the app on a physical Android device:
 
-**[Download app-debug.apk (Google Drive)](https://drive.google.com/file/d/1MOR8m0PKoG2pG0GK9FpW-jhWdxy48IAs/view?usp=sharing)**
+**[Download app-debug.apk (Google Drive)](https://drive.google.com/file/d/1cHq0fBfm1FFENNVFnr3COQt5MnpRw6Oj/view?usp=sharing)**
 
 > ML Kit needs a real device (or a supported emulator image). Camera and storage permissions are required.
 

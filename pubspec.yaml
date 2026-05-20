@@ -11,8 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
-
   # State management
   flutter_bloc: ^9.0.0
   equatable: ^2.0.5
@@ -30,8 +28,6 @@ dependencies:
   # Permissions
   permission_handler: ^11.3.1
 
-  flutter_launcher_icons: ^0.14.4
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -39,6 +35,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   mocktail: ^1.0.4
   bloc_test: ^10.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter_launcher_icons:
   ios: true
