@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_colors.dart';
-import '../constants/app_dimensions.dart';
-import '../constants/app_strings.dart';
-import 'app_button.dart';
-import 'app_text.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class AppErrorView extends StatelessWidget {
   const AppErrorView({

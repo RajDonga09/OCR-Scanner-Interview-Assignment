@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:ocr_interview_assignment/core/constants/app_colors.dart';
-
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_spacing.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 class PassbookScannerActions extends StatelessWidget {
   const PassbookScannerActions({

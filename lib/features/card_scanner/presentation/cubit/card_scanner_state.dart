@@ -20,7 +20,9 @@ class CardScannerState extends Equatable {
   final String? errorMessage;
 
   bool get isLoading => status == CardScannerStatus.loading;
+
   bool get isSuccess => status == CardScannerStatus.success;
+
   bool get isFailure => status == CardScannerStatus.failure;
 
   CardScannerState copyWith({
@@ -41,6 +43,11 @@ class CardScannerState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [status, image?.path, details, rawText, errorMessage];
+  List<Object?> get props => [
+    status,
+    image?.path,
+    details,
+    rawText,
+    errorMessage,
+  ];
 }

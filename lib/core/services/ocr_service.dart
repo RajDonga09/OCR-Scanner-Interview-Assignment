@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-
-import '../utils/logger.dart';
-import '../utils/text_cleaner.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class OcrResult extends Equatable {
   const OcrResult({
@@ -25,6 +23,7 @@ class OcrResult extends Equatable {
 
 sealed class OcrException implements Exception {
   const OcrException(this.message);
+
   final String message;
 
   @override
@@ -37,18 +36,20 @@ class OcrEmptyException extends OcrException {
 
 class OcrFailureException extends OcrException {
   const OcrFailureException(super.message, {this.cause});
+
   final Object? cause;
 }
 
 abstract class OcrService {
   Future<OcrResult> extractText(File image);
+
   Future<void> dispose();
 }
 
 class MlKitOcrService implements OcrService {
   MlKitOcrService({TextRecognizer? recognizer})
-      : _recognizer =
-            recognizer ?? TextRecognizer(script: TextRecognitionScript.latin);
+    : _recognizer =
+          recognizer ?? TextRecognizer(script: TextRecognitionScript.latin);
 
   final TextRecognizer _recognizer;
 

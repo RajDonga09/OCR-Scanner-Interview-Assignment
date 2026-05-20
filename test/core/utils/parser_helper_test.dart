@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ocr_interview_assignment/core/utils/parser_helper.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 void main() {
   group('ParserHelper.digitsOnly', () {

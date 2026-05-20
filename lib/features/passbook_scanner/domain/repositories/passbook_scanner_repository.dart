@@ -1,15 +1,9 @@
-import 'dart:io';
-
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/services/image_crop_service.dart';
-import '../../../../core/services/image_service.dart';
-import '../../../../core/services/ocr_service.dart';
-import '../../../../core/services/permission_service.dart';
-import '../models/bank_details.dart';
-import '../parsers/passbook_parser.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 sealed class PassbookScanFailure implements Exception {
   const PassbookScanFailure(this.message);
+
   final String message;
 
   @override
@@ -83,8 +77,10 @@ class PassbookScannerRepositoryImpl implements PassbookScannerRepository {
       throw const PassbookScanNoImageFailure('No image was selected.');
     }
 
-    final cropped =
-        await imageCropService.cropImage(picked, CropProfile.passbook);
+    final cropped = await imageCropService.cropImage(
+      picked,
+      CropProfile.passbook,
+    );
     if (cropped == null) {
       throw const PassbookScanCropCancelledFailure(
         AppStrings.errorCropCancelled,

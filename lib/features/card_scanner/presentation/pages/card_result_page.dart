@@ -1,23 +1,5 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/utils/parser_helper.dart';
-import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_image_preview.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/common_scaffold.dart';
-import '../../../../core/widgets/info_row.dart';
-import '../../domain/models/card_details.dart';
-import '../cubit/card_scanner_cubit.dart';
-import '../widgets/card_visual.dart';
-import '../widgets/raw_text_view.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
 
 class CardResultPage extends StatelessWidget {
   const CardResultPage({
@@ -63,8 +45,9 @@ class CardResultPage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     final luhnColor = details.isLuhnValid ? AppColors.success : AppColors.error;
-    final luhnLabel =
-        details.isLuhnValid ? AppStrings.luhnPassed : AppStrings.luhnFailed;
+    final luhnLabel = details.isLuhnValid
+        ? AppStrings.luhnPassed
+        : AppStrings.luhnFailed;
     final formattedNumber = details.cardNumber == null
         ? AppStrings.notDetected
         : ParserHelper.formatCardNumber(details.cardNumber!);
@@ -79,8 +62,10 @@ class CardResultPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AppText(AppStrings.extractedData,
-                  variant: AppTextVariant.bodyStrong),
+              const AppText(
+                AppStrings.extractedData,
+                variant: AppTextVariant.bodyStrong,
+              ),
               AppSpacing.v4,
               InfoRow(
                 label: AppStrings.cardNumber,
@@ -129,8 +114,10 @@ class CardResultPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AppText(AppStrings.preview,
-                  variant: AppTextVariant.bodyStrong),
+              const AppText(
+                AppStrings.preview,
+                variant: AppTextVariant.bodyStrong,
+              ),
               AppSpacing.v8,
               AppImagePreview(file: image),
             ],

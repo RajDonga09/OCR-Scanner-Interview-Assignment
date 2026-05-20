@@ -1,5 +1,4 @@
-import '../constants/app_regex.dart';
-import 'extensions.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class ParserHelper {
   const ParserHelper._();
@@ -37,8 +36,7 @@ class ParserHelper {
       if (letters.length < 4) continue;
 
       final upper = line.toUpperCase();
-      if (AppRegex.humanName.hasMatch(upper) ||
-          _titleCaseName.hasMatch(line)) {
+      if (AppRegex.humanName.hasMatch(upper) || _titleCaseName.hasMatch(line)) {
         return line.collapseWhitespace();
       }
 

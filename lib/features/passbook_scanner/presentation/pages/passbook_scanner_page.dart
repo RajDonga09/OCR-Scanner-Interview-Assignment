@@ -1,20 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/di/injection.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_image_preview.dart';
-import '../../../../core/widgets/app_loader.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/common_scaffold.dart';
-import '../cubit/passbook_scanner_cubit.dart';
-import '../widgets/passbook_scanner_actions.dart';
-import 'passbook_result_page.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 class PassbookScannerPage extends StatelessWidget {
   const PassbookScannerPage({super.key});
@@ -91,8 +76,9 @@ class _PassbookScannerView extends StatelessWidget {
                         padding: const EdgeInsets.all(AppDimensions.space12),
                         decoration: BoxDecoration(
                           color: AppColors.secondary.withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppDimensions.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                         ),
                         child: const Icon(
                           Icons.account_balance_rounded,

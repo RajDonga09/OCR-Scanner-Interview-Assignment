@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 enum CardBrand { visa, masterCard, amex, rupay, discover, unknown }
 
@@ -62,13 +62,13 @@ class CardDetails extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
-        'cardNumber': cardNumber,
-        'maskedNumber': maskedNumber,
-        'holderName': holderName,
-        'expiry': expiry,
-        'brand': brand.name,
-        'isLuhnValid': isLuhnValid,
-      };
+    'cardNumber': cardNumber,
+    'maskedNumber': maskedNumber,
+    'holderName': holderName,
+    'expiry': expiry,
+    'brand': brand.name,
+    'isLuhnValid': isLuhnValid,
+  };
 
   factory CardDetails.fromJson(Map<String, dynamic> json) {
     return CardDetails(
@@ -85,6 +85,12 @@ class CardDetails extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [cardNumber, maskedNumber, holderName, expiry, brand, isLuhnValid];
+  List<Object?> get props => [
+    cardNumber,
+    maskedNumber,
+    holderName,
+    expiry,
+    brand,
+    isLuhnValid,
+  ];
 }

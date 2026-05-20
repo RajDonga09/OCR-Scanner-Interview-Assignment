@@ -8,9 +8,7 @@ class AppRegex {
   static final RegExp lettersOnlyLine = RegExp(r"^[A-Za-z .'\-]+$");
 
   static final RegExp cardNumberLoose = RegExp(r'(?:\d[ -]?){12,18}\d');
-  static final RegExp expiry = RegExp(
-    r'(0[1-9]|1[0-2])[ /\-]?(\d{2}|\d{4})',
-  );
+  static final RegExp expiry = RegExp(r'(0[1-9]|1[0-2])[ /\-]?(\d{2}|\d{4})');
 
   static final RegExp ifsc = RegExp(r'\b[A-Z]{4}0[A-Z0-9]{6}\b');
   static final RegExp mobileNumber = RegExp(r'(?:\+?91[- ]?)?[6-9]\d{9}');

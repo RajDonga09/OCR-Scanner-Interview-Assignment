@@ -1,4 +1,4 @@
-import '../constants/app_regex.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class TextCleaner {
   const TextCleaner._();

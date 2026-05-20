@@ -1,10 +1,4 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
-
-import '../constants/app_constants.dart';
-import '../constants/app_strings.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 enum CropProfile { card, passbook }
 

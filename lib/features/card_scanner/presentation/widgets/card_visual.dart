@@ -1,10 +1,5 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../domain/models/card_details.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
 
 class CardVisual extends StatelessWidget {
   const CardVisual({super.key, required this.details});
@@ -23,10 +18,7 @@ class CardVisual extends StatelessWidget {
         padding: const EdgeInsets.all(AppDimensions.space20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [
-              AppColors.cardGradientStart,
-              AppColors.cardGradientEnd,
-            ],
+            colors: [AppColors.cardGradientStart, AppColors.cardGradientEnd],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -44,8 +36,10 @@ class CardVisual extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.contactless_rounded,
-                    color: AppColors.textOnPrimary),
+                const Icon(
+                  Icons.contactless_rounded,
+                  color: AppColors.textOnPrimary,
+                ),
                 const Spacer(),
                 AppText(
                   details.brand.displayName.toUpperCase(),

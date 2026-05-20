@@ -20,7 +20,9 @@ class PassbookScannerState extends Equatable {
   final String? errorMessage;
 
   bool get isLoading => status == PassbookScannerStatus.loading;
+
   bool get isSuccess => status == PassbookScannerStatus.success;
+
   bool get isFailure => status == PassbookScannerStatus.failure;
 
   PassbookScannerState copyWith({
@@ -41,6 +43,11 @@ class PassbookScannerState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [status, image?.path, details, rawText, errorMessage];
+  List<Object?> get props => [
+    status,
+    image?.path,
+    details,
+    rawText,
+    errorMessage,
+  ];
 }

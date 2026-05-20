@@ -1,13 +1,7 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/common_scaffold.dart';
-import '../../../card_scanner/presentation/pages/card_scanner_page.dart';
-import '../../../passbook_scanner/presentation/pages/passbook_scanner_page.dart';
-import '../widgets/home_feature_tile.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
+import 'package:ocr_interview_assignment/features/home/home.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -22,10 +16,7 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppSpacing.v4,
-          const AppText(
-            AppStrings.homeTitle,
-            variant: AppTextVariant.display,
-          ),
+          const AppText(AppStrings.homeTitle, variant: AppTextVariant.display),
           AppSpacing.v8,
           const AppText(
             AppStrings.homeSubtitle,
@@ -38,10 +29,7 @@ class HomePage extends StatelessWidget {
             description: AppStrings.scanCardDescription,
             icon: Icons.credit_card_rounded,
             gradient: const LinearGradient(
-              colors: [
-                AppColors.cardGradientStart,
-                AppColors.cardGradientEnd,
-              ],
+              colors: [AppColors.cardGradientStart, AppColors.cardGradientEnd],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

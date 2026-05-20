@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 class HomeFeatureTile extends StatelessWidget {
   const HomeFeatureTile({

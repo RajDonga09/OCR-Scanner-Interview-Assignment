@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart' as picker;
-
-import '../constants/app_constants.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 enum AppImageSource { camera, gallery }
 
@@ -12,7 +11,7 @@ abstract class ImageService {
 
 class ImageServiceImpl implements ImageService {
   ImageServiceImpl({picker.ImagePicker? imagePicker})
-      : _picker = imagePicker ?? picker.ImagePicker();
+    : _picker = imagePicker ?? picker.ImagePicker();
 
   final picker.ImagePicker _picker;
 

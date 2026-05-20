@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ocr_interview_assignment/features/passbook_scanner/domain/parsers/passbook_parser.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 void main() {
   const parser = PassbookParser();

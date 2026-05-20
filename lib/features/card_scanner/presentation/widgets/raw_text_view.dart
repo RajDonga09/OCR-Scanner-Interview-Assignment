@@ -1,11 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 class RawTextView extends StatefulWidget {
   const RawTextView({super.key, required this.text});
@@ -27,12 +20,16 @@ class _RawTextViewState extends State<RawTextView> {
         children: [
           Row(
             children: [
-              const Icon(Icons.text_snippet_outlined,
-                  size: AppDimensions.iconSm,
-                  color: AppColors.textSecondary),
+              const Icon(
+                Icons.text_snippet_outlined,
+                size: AppDimensions.iconSm,
+                color: AppColors.textSecondary,
+              ),
               AppSpacing.h8,
-              const AppText(AppStrings.rawText,
-                  variant: AppTextVariant.bodyStrong),
+              const AppText(
+                AppStrings.rawText,
+                variant: AppTextVariant.bodyStrong,
+              ),
               const Spacer(),
               TextButton(
                 onPressed: () => setState(() => _expanded = !_expanded),

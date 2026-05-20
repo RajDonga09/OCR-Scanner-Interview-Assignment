@@ -1,5 +1,4 @@
-import '../../../../core/utils/parser_helper.dart';
-import '../../../../core/utils/validators.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 /// Luhn (mod-10) check for card numbers.
 class LuhnValidator {

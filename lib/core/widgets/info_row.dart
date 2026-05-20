@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../constants/app_colors.dart';
-import '../constants/app_dimensions.dart';
-import '../constants/app_strings.dart';
-import 'app_text.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class InfoRow extends StatelessWidget {
   const InfoRow({
@@ -40,8 +36,11 @@ class InfoRow extends StatelessWidget {
                 color: AppColors.surfaceAlt,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
               ),
-              child: Icon(icon, size: AppDimensions.iconSm,
-                  color: AppColors.textSecondary),
+              child: Icon(
+                icon,
+                size: AppDimensions.iconSm,
+                color: AppColors.textSecondary,
+              ),
             ),
             const SizedBox(width: AppDimensions.space12),
           ],
@@ -49,10 +48,7 @@ class InfoRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText(
-                  label.toUpperCase(),
-                  variant: AppTextVariant.label,
-                ),
+                AppText(label.toUpperCase(), variant: AppTextVariant.label),
                 const SizedBox(height: 2),
                 AppText(
                   displayValue,
@@ -66,9 +62,11 @@ class InfoRow extends StatelessWidget {
           ),
           if (copyable && _hasValue)
             IconButton(
-              icon: const Icon(Icons.copy_rounded,
-                  size: AppDimensions.iconSm,
-                  color: AppColors.textMuted),
+              icon: const Icon(
+                Icons.copy_rounded,
+                size: AppDimensions.iconSm,
+                color: AppColors.textMuted,
+              ),
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: value!));
                 if (!context.mounted) return;

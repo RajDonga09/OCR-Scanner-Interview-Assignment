@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_dimensions.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class AppSpacing {
   const AppSpacing._();

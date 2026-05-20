@@ -1,15 +1,11 @@
-import 'dart:io';
+import 'package:ocr_interview_assignment/dependency.dart';
 
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/services/image_crop_service.dart';
-import '../../../../core/services/image_service.dart';
-import '../../../../core/services/ocr_service.dart';
-import '../../../../core/services/permission_service.dart';
 import '../models/card_details.dart';
 import '../parsers/card_parser.dart';
 
 sealed class CardScanFailure implements Exception {
   const CardScanFailure(this.message);
+
   final String message;
 
   @override

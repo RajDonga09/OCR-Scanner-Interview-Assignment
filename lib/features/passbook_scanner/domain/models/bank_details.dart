@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 class BankDetails extends Equatable {
   const BankDetails({
@@ -41,13 +41,13 @@ class BankDetails extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
-        'accountHolder': accountHolder,
-        'accountNumber': accountNumber,
-        'ifsc': ifsc,
-        'bankName': bankName,
-        'branch': branch,
-        'isIfscValid': isIfscValid,
-      };
+    'accountHolder': accountHolder,
+    'accountNumber': accountNumber,
+    'ifsc': ifsc,
+    'bankName': bankName,
+    'branch': branch,
+    'isIfscValid': isIfscValid,
+  };
 
   factory BankDetails.fromJson(Map<String, dynamic> json) {
     return BankDetails(
@@ -61,6 +61,12 @@ class BankDetails extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [accountHolder, accountNumber, ifsc, bankName, branch, isIfscValid];
+  List<Object?> get props => [
+    accountHolder,
+    accountNumber,
+    ifsc,
+    bankName,
+    branch,
+    isIfscValid,
+  ];
 }

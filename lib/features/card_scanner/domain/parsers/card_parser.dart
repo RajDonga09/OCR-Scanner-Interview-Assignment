@@ -1,8 +1,5 @@
-import '../../../../core/constants/app_regex.dart';
-import '../../../../core/utils/extensions.dart';
-import '../../../../core/utils/parser_helper.dart';
-import '../../../../core/utils/text_cleaner.dart';
-import '../../../../core/utils/validators.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+
 import '../models/card_details.dart';
 import 'luhn_validator.dart';
 
@@ -74,7 +71,8 @@ class CardParser {
 
     for (final line in lines) {
       final upper = line.toUpperCase();
-      final isExpiryLine = upper.contains('VALID') ||
+      final isExpiryLine =
+          upper.contains('VALID') ||
           upper.contains('THRU') ||
           upper.contains('EXP');
 
@@ -159,10 +157,7 @@ class CardParser {
     final fromBottom = _extractHolderFromBottom(lines);
     if (fromBottom != null) return fromBottom;
 
-    return ParserHelper.bestNameCandidate(
-      lines,
-      exclusions: _holderExclusions,
-    );
+    return ParserHelper.bestNameCandidate(lines, exclusions: _holderExclusions);
   }
 
   /// Card holder names sit at the bottom; scan upward and merge split lines.

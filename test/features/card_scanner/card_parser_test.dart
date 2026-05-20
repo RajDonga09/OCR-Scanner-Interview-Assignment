@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ocr_interview_assignment/features/card_scanner/domain/models/card_details.dart';
-import 'package:ocr_interview_assignment/features/card_scanner/domain/parsers/card_parser.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
 
 void main() {
   const parser = CardParser();

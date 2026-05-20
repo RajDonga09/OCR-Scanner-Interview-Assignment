@@ -1,20 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/di/injection.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_image_preview.dart';
-import '../../../../core/widgets/app_loader.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/common_scaffold.dart';
-import '../cubit/card_scanner_cubit.dart';
-import '../widgets/card_scanner_actions.dart';
-import 'card_result_page.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
 
 class CardScannerPage extends StatelessWidget {
   const CardScannerPage({super.key});
@@ -91,8 +76,9 @@ class _CardScannerView extends StatelessWidget {
                         padding: const EdgeInsets.all(AppDimensions.space12),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppDimensions.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                         ),
                         child: const Icon(
                           Icons.credit_card_rounded,

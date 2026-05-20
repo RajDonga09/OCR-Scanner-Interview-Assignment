@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_dimensions.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class CommonScaffold extends StatelessWidget {
   const CommonScaffold({
@@ -44,9 +43,7 @@ class CommonScaffold extends StatelessWidget {
       body: SafeArea(
         top: safeAreaTop,
         bottom: safeAreaBottom,
-        child: scrollable
-            ? SingleChildScrollView(child: padded)
-            : padded,
+        child: scrollable ? SingleChildScrollView(child: padded) : padded,
       ),
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,

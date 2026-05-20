@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:ocr_interview_assignment/core/services/image_service.dart';
-import 'package:ocr_interview_assignment/features/passbook_scanner/domain/models/bank_details.dart';
-import 'package:ocr_interview_assignment/features/passbook_scanner/domain/repositories/passbook_scanner_repository.dart';
-import 'package:ocr_interview_assignment/features/passbook_scanner/presentation/cubit/passbook_scanner_cubit.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 class _MockRepository extends Mock implements PassbookScannerRepository {}
 

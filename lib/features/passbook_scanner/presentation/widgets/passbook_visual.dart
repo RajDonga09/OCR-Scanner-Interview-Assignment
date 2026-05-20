@@ -1,10 +1,5 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../domain/models/bank_details.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 class PassbookVisual extends StatelessWidget {
   const PassbookVisual({super.key, required this.details});
@@ -38,8 +33,10 @@ class PassbookVisual extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_balance_rounded,
-                  color: AppColors.textOnPrimary),
+              const Icon(
+                Icons.account_balance_rounded,
+                color: AppColors.textOnPrimary,
+              ),
               const SizedBox(width: AppDimensions.space8),
               Expanded(
                 child: AppText(

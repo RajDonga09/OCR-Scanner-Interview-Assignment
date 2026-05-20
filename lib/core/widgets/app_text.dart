@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_colors.dart';
-import '../constants/app_dimensions.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 enum AppTextVariant {
   display,
@@ -37,7 +35,9 @@ class AppText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: _styleFor(variant).copyWith(color: color ?? _defaultColor(variant)),
+      style: _styleFor(
+        variant,
+      ).copyWith(color: color ?? _defaultColor(variant)),
       textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,

@@ -1,10 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
-import '../constants/app_colors.dart';
-import '../constants/app_dimensions.dart';
-import 'app_text.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class AppImagePreview extends StatelessWidget {
   const AppImagePreview({

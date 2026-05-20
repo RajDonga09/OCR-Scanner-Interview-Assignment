@@ -1,18 +1,11 @@
-import 'dart:io';
-
-import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/services/image_service.dart';
-import '../../../../core/utils/logger.dart';
-import '../../domain/models/card_details.dart';
-import '../../domain/repositories/card_scanner_repository.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
 
 part 'card_scanner_state.dart';
 
 class CardScannerCubit extends Cubit<CardScannerState> {
   CardScannerCubit({required this.repository})
-      : super(CardScannerState.initial());
+    : super(CardScannerState.initial());
 
   final CardScannerRepository repository;
 
@@ -23,38 +16,41 @@ class CardScannerCubit extends Cubit<CardScannerState> {
   void reset() => emit(CardScannerState.initial());
 
   Future<void> _scan(AppImageSource source) async {
-    emit(state.copyWith(
-      status: CardScannerStatus.loading,
-      clearError: true,
-    ));
+    emit(state.copyWith(status: CardScannerStatus.loading, clearError: true));
 
     try {
       final result = await repository.scan(source);
-      emit(state.copyWith(
-        status: CardScannerStatus.success,
-        image: result.image,
-        details: result.details,
-        rawText: result.rawText,
-        clearError: true,
-      ));
+      emit(
+        state.copyWith(
+          status: CardScannerStatus.success,
+          image: result.image,
+          details: result.details,
+          rawText: result.rawText,
+          clearError: true,
+        ),
+      );
     } on CardScanCropCancelledFailure {
       emit(CardScannerState.initial());
     } on CardScanFailure catch (e) {
       AppLogger.error('Card scan failed', error: e);
-      emit(state.copyWith(
-        status: CardScannerStatus.failure,
-        errorMessage: e.message,
-      ));
+      emit(
+        state.copyWith(
+          status: CardScannerStatus.failure,
+          errorMessage: e.message,
+        ),
+      );
     } catch (e, stack) {
       AppLogger.error(
         'Card scan crashed unexpectedly',
         error: e,
         stackTrace: stack,
       );
-      emit(state.copyWith(
-        status: CardScannerStatus.failure,
-        errorMessage: 'Unexpected error: $e',
-      ));
+      emit(
+        state.copyWith(
+          status: CardScannerStatus.failure,
+          errorMessage: 'Unexpected error: $e',
+        ),
+      );
     }
   }
 }

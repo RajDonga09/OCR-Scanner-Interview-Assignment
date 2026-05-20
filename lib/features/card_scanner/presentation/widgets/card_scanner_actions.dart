@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_spacing.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
 
 class CardScannerActions extends StatelessWidget {
   const CardScannerActions({

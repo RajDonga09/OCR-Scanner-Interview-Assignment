@@ -1,5 +1,4 @@
-import '../constants/app_constants.dart';
-import '../constants/app_regex.dart';
+import 'package:ocr_interview_assignment/core/core.dart';
 
 class Validators {
   const Validators._();

@@ -1,22 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_card.dart';
-import '../../../../core/widgets/app_image_preview.dart';
-import '../../../../core/widgets/app_spacing.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/common_scaffold.dart';
-import '../../../../core/widgets/info_row.dart';
-import '../../../card_scanner/presentation/widgets/raw_text_view.dart';
-import '../../domain/models/bank_details.dart';
-import '../cubit/passbook_scanner_cubit.dart';
-import '../widgets/passbook_visual.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/card_scanner/card_scanner.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
 class PassbookResultPage extends StatelessWidget {
   const PassbookResultPage({
@@ -61,13 +45,12 @@ class PassbookResultPage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context) {
-    final ifscColor =
-        details.isIfscValid ? AppColors.success : AppColors.error;
+    final ifscColor = details.isIfscValid ? AppColors.success : AppColors.error;
     final ifscLabel = details.ifsc == null
         ? AppStrings.notDetected
         : details.isIfscValid
-            ? '${details.ifsc} (valid)'
-            : '${details.ifsc} (invalid)';
+        ? '${details.ifsc} (valid)'
+        : '${details.ifsc} (invalid)';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -79,8 +62,10 @@ class PassbookResultPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AppText(AppStrings.extractedData,
-                  variant: AppTextVariant.bodyStrong),
+              const AppText(
+                AppStrings.extractedData,
+                variant: AppTextVariant.bodyStrong,
+              ),
               AppSpacing.v4,
               InfoRow(
                 label: AppStrings.accountHolder,
@@ -120,8 +105,10 @@ class PassbookResultPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AppText(AppStrings.preview,
-                  variant: AppTextVariant.bodyStrong),
+              const AppText(
+                AppStrings.preview,
+                variant: AppTextVariant.bodyStrong,
+              ),
               AppSpacing.v8,
               AppImagePreview(file: image),
             ],

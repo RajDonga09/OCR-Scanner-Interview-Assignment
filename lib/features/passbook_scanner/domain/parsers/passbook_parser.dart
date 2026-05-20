@@ -1,16 +1,9 @@
-import '../../../../core/constants/app_regex.dart';
-import '../../../../core/utils/parser_helper.dart';
-import '../../../../core/utils/text_cleaner.dart';
-import '../../../../core/utils/validators.dart';
-import '../models/bank_details.dart';
+import 'package:ocr_interview_assignment/dependency.dart';
+import 'package:ocr_interview_assignment/features/passbook_scanner/passbook_scanner.dart';
 
-/// Generic passbook parser — works from labelled fields and digit patterns,
-/// not bank-specific rules.
 class PassbookParser {
   const PassbookParser();
 
-  /// IFSC prefixes for the major Indian banks. Used to score real IFSC
-  /// candidates higher than 4-letter OCR noise (e.g. `ADDR` from "Address").
   static const Set<String> _knownBankPrefixes = {
     'SBIN',
     'HDFC',
@@ -64,7 +57,6 @@ class PassbookParser {
     'DEUT',
   };
 
-  /// Account-label matcher tolerant of OCR letter swaps (e.g. `ACCoUa NO`).
   static final RegExp _accountLabelRegex = RegExp(
     r'(ACCOU\w*\s*(NO\.?|NUMBER)?|A\s*/\s*C\s*(NO\.?)?|AC\s*NO)',
     caseSensitive: false,
@@ -96,10 +88,6 @@ class PassbookParser {
     );
   }
 
-  /// Merges OCR-fragmented label tokens (e.g. `ACC` + `NO`) and re-pairs the
-  /// stacked layout where the recogniser returns the labels as one run and
-  /// the values as a matching run — common for the two-column SBI/HDFC
-  /// passbook.
   List<String> _mergeFragmentLines(List<String> lines) {
     final merged = <String>[];
     var i = 0;
@@ -131,9 +119,6 @@ class PassbookParser {
     return _restackColumns(merged);
   }
 
-  /// Pairs a run of consecutive label-only lines with the immediately
-  /// following run of value lines, 1-to-1, so the parser does not attach
-  /// the CIF value to the Account label by mistake.
   List<String> _restackColumns(List<String> lines) {
     for (var start = 0; start < lines.length - 1; start++) {
       if (!_isLabelOnlyLine(lines[start])) continue;
@@ -302,8 +287,6 @@ class PassbookParser {
     return Validators.isIfscValid(result) ? result : null;
   }
 
-  // ── Account ───────────────────────────────────────────────────────────────
-
   String? _extractAccountNumber(
     List<String> lines,
     String blob, {
@@ -429,8 +412,6 @@ class PassbookParser {
     return unique.first;
   }
 
-  // ── Holder / bank / branch ────────────────────────────────────────────────
-
   String? _extractHolderName(List<String> lines) {
     for (final line in lines) {
       final match = RegExp(
@@ -537,9 +518,6 @@ class PassbookParser {
 
     if (candidates.isEmpty) return null;
 
-    // On equal rank, prefer the later occurrence — passbook footers tend to
-    // repeat the branch name in cleaner type than the noisy header (e.g.
-    // "KELGACHTA" vs "KULGACHIA").
     candidates.sort((a, b) {
       final rankDiff = _branchRank(b.value).compareTo(_branchRank(a.value));
       if (rankDiff != 0) return rankDiff;
@@ -590,6 +568,7 @@ class PassbookParser {
 
 class _RankedCandidate {
   const _RankedCandidate(this.value, this.position);
+
   final String value;
   final int position;
 }
