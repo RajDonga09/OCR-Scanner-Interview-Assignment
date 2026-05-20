@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ocr_interview_assignment/core/constants/app_colors.dart';
 
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -33,6 +34,7 @@ class PassbookScannerActions extends StatelessWidget {
           icon: Icons.photo_library_rounded,
           onPressed: isLoading ? null : onGallery,
           variant: AppButtonVariant.outline,
+          themColor: AppColors.secondary,
         ),
       ],
     );

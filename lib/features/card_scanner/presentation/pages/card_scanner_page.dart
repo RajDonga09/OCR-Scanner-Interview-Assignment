@@ -79,44 +79,54 @@ class _CardScannerView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppSpacing.v4,
-        AppCard(
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.space12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppSpacing.v4,
+                AppCard(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppDimensions.space12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusMd),
+                        ),
+                        child: const Icon(
+                          Icons.credit_card_rounded,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      AppSpacing.h12,
+                      const Expanded(
+                        child: AppText(
+                          AppStrings.cardScannerHint,
+                          variant: AppTextVariant.caption,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: const Icon(
-                  Icons.credit_card_rounded,
-                  color: AppColors.primary,
+                AppSpacing.v20,
+                const AppImagePreview(
+                  file: null,
+                  placeholderLabel: 'Tap a button below to start',
                 ),
-              ),
-              AppSpacing.h12,
-              const Expanded(
-                child: AppText(
-                  AppStrings.cardScannerHint,
-                  variant: AppTextVariant.caption,
+                AppSpacing.v24,
+                const AppEmptyView(
+                  title: AppStrings.emptyTitle,
+                  message:
+                      'Scan a credit or debit card to extract its number, holder name and expiry date.',
+                  icon: Icons.credit_score_rounded,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        AppSpacing.v20,
-        const AppImagePreview(
-          file: null,
-          placeholderLabel: 'Tap a button below to start',
-        ),
-        AppSpacing.v24,
-        const AppEmptyView(
-          title: AppStrings.emptyTitle,
-          message:
-              'Scan a credit or debit card to extract its number, holder name and expiry date.',
-          icon: Icons.credit_score_rounded,
-        ),
-        const Spacer(),
+        AppSpacing.v16,
         CardScannerActions(
           onCamera: cubit.scanWithCamera,
           onGallery: cubit.scanWithGallery,

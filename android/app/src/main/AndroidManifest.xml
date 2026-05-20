@@ -10,7 +10,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application
-        android:label="ocr_interview_assignment"
+        android:label="OCR-Scanner"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

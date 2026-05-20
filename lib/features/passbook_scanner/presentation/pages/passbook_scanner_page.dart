@@ -79,44 +79,54 @@ class _PassbookScannerView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppSpacing.v4,
-        AppCard(
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.space12),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppSpacing.v4,
+                AppCard(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppDimensions.space12),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary.withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusMd),
+                        ),
+                        child: const Icon(
+                          Icons.account_balance_rounded,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                      AppSpacing.h12,
+                      const Expanded(
+                        child: AppText(
+                          AppStrings.passbookScannerHint,
+                          variant: AppTextVariant.caption,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: const Icon(
-                  Icons.account_balance_rounded,
-                  color: AppColors.secondary,
+                AppSpacing.v20,
+                const AppImagePreview(
+                  file: null,
+                  placeholderLabel: 'Tap a button below to start',
                 ),
-              ),
-              AppSpacing.h12,
-              const Expanded(
-                child: AppText(
-                  AppStrings.passbookScannerHint,
-                  variant: AppTextVariant.caption,
+                AppSpacing.v24,
+                const AppEmptyView(
+                  title: AppStrings.emptyTitle,
+                  message:
+                      'Scan a passbook page to extract the holder name, account number and IFSC code.',
+                  icon: Icons.menu_book_rounded,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        AppSpacing.v20,
-        const AppImagePreview(
-          file: null,
-          placeholderLabel: 'Tap a button below to start',
-        ),
-        AppSpacing.v24,
-        const AppEmptyView(
-          title: AppStrings.emptyTitle,
-          message:
-              'Scan a passbook page to extract the holder name, account number and IFSC code.',
-          icon: Icons.menu_book_rounded,
-        ),
-        const Spacer(),
+        AppSpacing.v16,
         PassbookScannerActions(
           onCamera: cubit.scanWithCamera,
           onGallery: cubit.scanWithGallery,

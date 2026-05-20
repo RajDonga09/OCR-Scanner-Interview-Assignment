@@ -14,6 +14,7 @@ class AppButton extends StatelessWidget {
     this.variant = AppButtonVariant.primary,
     this.isLoading = false,
     this.fullWidth = true,
+    this.themColor,
   });
 
   final String label;
@@ -22,6 +23,7 @@ class AppButton extends StatelessWidget {
   final AppButtonVariant variant;
   final bool isLoading;
   final bool fullWidth;
+  final Color? themColor;
 
   @override
   Widget build(BuildContext context) {
@@ -30,29 +32,34 @@ class AppButton extends StatelessWidget {
 
     final button = switch (variant) {
       AppButtonVariant.primary => ElevatedButton(
-          onPressed: isDisabled ? null : onPressed,
-          child: child,
-        ),
+        onPressed: isDisabled ? null : onPressed,
+        child: child,
+      ),
       AppButtonVariant.secondary => ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.secondary,
-            foregroundColor: AppColors.textOnPrimary,
-          ),
-          onPressed: isDisabled ? null : onPressed,
-          child: child,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.secondary,
+          foregroundColor: AppColors.textOnPrimary,
         ),
+        onPressed: isDisabled ? null : onPressed,
+        child: child,
+      ),
       AppButtonVariant.outline => OutlinedButton(
-          onPressed: isDisabled ? null : onPressed,
-          child: child,
-        ),
+        onPressed: isDisabled ? null : onPressed,
+        style: themColor != null
+            ? ButtonStyle(
+                side: WidgetStateProperty.all(BorderSide(color: themColor!)),
+              )
+            : null,
+        child: child,
+      ),
       AppButtonVariant.danger => ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.error,
-            foregroundColor: AppColors.textOnPrimary,
-          ),
-          onPressed: isDisabled ? null : onPressed,
-          child: child,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.error,
+          foregroundColor: AppColors.textOnPrimary,
         ),
+        onPressed: isDisabled ? null : onPressed,
+        child: child,
+      ),
     };
 
     return fullWidth ? SizedBox(width: double.infinity, child: button) : button;
@@ -75,9 +82,9 @@ class AppButton extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: AppDimensions.iconMd),
+        Icon(icon, size: AppDimensions.iconMd, color: themColor),
         const SizedBox(width: AppDimensions.space8),
-        Text(label),
+        Text(label, style: TextStyle(color: themColor)),
       ],
     );
   }
