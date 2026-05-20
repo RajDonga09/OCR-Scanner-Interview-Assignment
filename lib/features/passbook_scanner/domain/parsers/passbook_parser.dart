@@ -9,10 +9,73 @@ import '../models/bank_details.dart';
 class PassbookParser {
   const PassbookParser();
 
+  /// IFSC prefixes for the major Indian banks. Used to score real IFSC
+  /// candidates higher than 4-letter OCR noise (e.g. `ADDR` from "Address").
+  static const Set<String> _knownBankPrefixes = {
+    'SBIN',
+    'HDFC',
+    'ICIC',
+    'AXIS',
+    'PUNB',
+    'CNRB',
+    'UTIB',
+    'IDFB',
+    'KKBK',
+    'IOBA',
+    'INDB',
+    'IBKL',
+    'MAHB',
+    'BARB',
+    'BKID',
+    'CBIN',
+    'CORP',
+    'FDRL',
+    'ORBC',
+    'PSIB',
+    'SCBL',
+    'SIBL',
+    'SRCB',
+    'SYNB',
+    'UCBA',
+    'UBIN',
+    'UTBI',
+    'VIJB',
+    'YESB',
+    'RATN',
+    'BOFA',
+    'CITI',
+    'HSBC',
+    'CIUB',
+    'JAKA',
+    'KARB',
+    'TMBL',
+    'DCBL',
+    'IDIB',
+    'IDFC',
+    'AUBL',
+    'BDBL',
+    'ESFB',
+    'FINO',
+    'PYTM',
+    'SURY',
+    'UJVN',
+    'UTKS',
+    'ANDB',
+    'DEUT',
+  };
+
+  /// Account-label matcher tolerant of OCR letter swaps (e.g. `ACCoUa NO`).
+  static final RegExp _accountLabelRegex = RegExp(
+    r'(ACCOU\w*\s*(NO\.?|NUMBER)?|A\s*/\s*C\s*(NO\.?)?|AC\s*NO)',
+    caseSensitive: false,
+  );
+
   BankDetails parsePassbook(String rawText) {
     if (rawText.isEmpty) return BankDetails.empty();
 
-    final lines = _mergeFragmentLines(TextCleaner.toLines(TextCleaner.clean(rawText)));
+    final lines = _mergeFragmentLines(
+      TextCleaner.toLines(TextCleaner.clean(rawText)),
+    );
     if (lines.isEmpty) return BankDetails.empty();
 
     final blob = lines.join(' ');
@@ -33,26 +96,31 @@ class PassbookParser {
     );
   }
 
-  /// OCR often splits labels across lines (`ACCoUa` + `NO` + account digits).
+  /// Merges OCR-fragmented label tokens (e.g. `ACC` + `NO`) and re-pairs the
+  /// stacked layout where the recogniser returns the labels as one run and
+  /// the values as a matching run — common for the two-column SBI/HDFC
+  /// passbook.
   List<String> _mergeFragmentLines(List<String> lines) {
     final merged = <String>[];
     var i = 0;
 
     while (i < lines.length) {
       var line = lines[i];
-      final upper = line.toUpperCase();
+      final trimmed = line.trim();
 
-      if (RegExp(r'^ACC', caseSensitive: false).hasMatch(upper) &&
+      if (RegExp(r'^ACC[A-Za-z]*$').hasMatch(trimmed) &&
           i + 1 < lines.length &&
-          RegExp(r'^NO\.?$', caseSensitive: false).hasMatch(lines[i + 1].toUpperCase())) {
+          RegExp(
+            r'^NO\.?$',
+            caseSensitive: false,
+          ).hasMatch(lines[i + 1].trim().toUpperCase())) {
         line = '$line ${lines[++i]}';
-        if (i + 1 < lines.length &&
-            RegExp(r'^[A-Z]?\d').hasMatch(lines[i + 1])) {
-          line = '$line ${lines[++i]}';
-        }
-      } else if (RegExp(r'^CIF\b', caseSensitive: false).hasMatch(upper) &&
+      } else if (RegExp(r'^CIF$', caseSensitive: false).hasMatch(trimmed) &&
           i + 1 < lines.length &&
-          !RegExp(r'^ACC', caseSensitive: false).hasMatch(lines[i + 1].toUpperCase())) {
+          RegExp(
+            r'^N(O\.?|UMBER)?$',
+            caseSensitive: false,
+          ).hasMatch(lines[i + 1].trim().toUpperCase())) {
         line = '$line ${lines[++i]}';
       }
 
@@ -60,19 +128,74 @@ class PassbookParser {
       i++;
     }
 
-    return merged;
+    return _restackColumns(merged);
   }
 
-  // ── IFSC ──────────────────────────────────────────────────────────────────
+  /// Pairs a run of consecutive label-only lines with the immediately
+  /// following run of value lines, 1-to-1, so the parser does not attach
+  /// the CIF value to the Account label by mistake.
+  List<String> _restackColumns(List<String> lines) {
+    for (var start = 0; start < lines.length - 1; start++) {
+      if (!_isLabelOnlyLine(lines[start])) continue;
+
+      var labelEnd = start;
+      while (labelEnd < lines.length && _isLabelOnlyLine(lines[labelEnd])) {
+        labelEnd++;
+      }
+      final labelCount = labelEnd - start;
+      if (labelCount < 2) continue;
+
+      var valueEnd = labelEnd;
+      while (valueEnd < lines.length &&
+          _isLongDigitValueLine(lines[valueEnd])) {
+        valueEnd++;
+      }
+      final valueCount = valueEnd - labelEnd;
+      if (valueCount != labelCount) continue;
+
+      final paired = <String>[];
+      for (var k = 0; k < start; k++) {
+        paired.add(lines[k]);
+      }
+      for (var k = 0; k < labelCount; k++) {
+        paired.add('${lines[start + k]} ${lines[labelEnd + k]}');
+      }
+      for (var k = valueEnd; k < lines.length; k++) {
+        paired.add(lines[k]);
+      }
+      return paired;
+    }
+    return lines;
+  }
+
+  bool _isLabelOnlyLine(String line) {
+    final upper = line.trim().toUpperCase();
+    if (upper.isEmpty) return false;
+    final hasLabel =
+        RegExp(r'\bCIF\b').hasMatch(upper) ||
+        _accountLabelRegex.hasMatch(upper);
+    if (!hasLabel) return false;
+    final digits = upper.replaceAll(RegExp(r'[^0-9]'), '');
+    return digits.length < 5;
+  }
+
+  bool _isLongDigitValueLine(String line) {
+    final trimmed = line.trim();
+    if (trimmed.isEmpty) return false;
+    final digits = trimmed.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length < 9 || digits.length > 18) return false;
+    final nonNumeric = trimmed.replaceAll(RegExp(r'[0-9\s.]'), '');
+    return nonNumeric.length <= 1;
+  }
 
   String? _extractIfsc(List<String> lines, String blob) {
-    final branchDigits = _branchCodeDigits(blob);
     final candidates = <String, int>{};
 
     void add(String? code, {required int score}) {
       if (code == null || !Validators.isIfscValid(code)) return;
       final prev = candidates[code];
-      if (prev == null || score > prev) candidates[code] = score;
+      final total = score + _leadingZeroBonus(code);
+      if (prev == null || total > prev) candidates[code] = total;
     }
 
     for (final line in lines) {
@@ -80,43 +203,26 @@ class PassbookParser {
 
       final onIfscLine = line.toUpperCase().contains('IFSC');
       for (final code in _ifscCandidatesFromLine(line)) {
-        add(code, score: onIfscLine ? 40 : 20);
-      }
-    }
-
-    final bankCodes = candidates.keys
-        .map((c) => c.substring(0, 4))
-        .where(_isLikelyBankPrefix)
-        .toSet();
-
-    if (branchDigits != null) {
-      final suffix = branchDigits.padLeft(6, '0');
-      for (final bank in bankCodes) {
-        add('${bank}0$suffix', score: 35);
+        var score = onIfscLine ? 40 : 20;
+        if (_knownBankPrefixes.contains(code.substring(0, 4))) {
+          score += 30;
+        }
+        add(code, score: score);
       }
     }
 
     if (candidates.isEmpty) return null;
 
-    return candidates.entries
-        .map((e) => MapEntry(e.key, e.value + _ifscBonus(e.key, branchDigits)))
-        .reduce((a, b) => a.value >= b.value ? a : b)
-        .key;
+    return candidates.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
   }
 
-  int _ifscBonus(String ifsc, String? branchDigits) {
-    if (branchDigits == null) return 0;
-    final suffix = branchDigits.padLeft(6, '0');
-    if (ifsc.endsWith(suffix)) return 15;
-    return 0;
-  }
-
-  String? _branchCodeDigits(String blob) {
-    final match = RegExp(
-      r'BRANCH\s*COD[E]?\D*(\d{3,6})',
-      caseSensitive: false,
-    ).firstMatch(blob.toUpperCase());
-    return match?.group(1);
+  int _leadingZeroBonus(String ifsc) {
+    final tail = ifsc.substring(5);
+    var count = 0;
+    while (count < tail.length && tail[count] == '0') {
+      count++;
+    }
+    return count * 5;
   }
 
   Iterable<String> _ifscCandidatesFromLine(String line) {
@@ -131,47 +237,67 @@ class PassbookParser {
       caseSensitive: false,
     ).firstMatch(line);
     if (explicit != null) {
-      final repaired = _repairIfsc(explicit.group(1)!);
-      if (repaired != null) found.add(repaired);
+      _addRepairVariants(found, explicit.group(1)!);
     }
 
     final direct = AppRegex.ifsc.firstMatch(upper);
     if (direct != null) found.add(direct.group(0)!);
 
     final scanStart = upper.contains('IFSC') ? upper.indexOf('IFSC') + 4 : 0;
-    final compact =
-        upper.substring(scanStart).replaceAll(RegExp(r'[^A-Z0-9]'), '');
+    final compact = upper
+        .substring(scanStart)
+        .replaceAll(RegExp(r'[^A-Z0-9]'), '');
 
     for (var i = 0; i <= compact.length - 11; i++) {
-      final repaired = _repairIfsc(compact.substring(i, i + 11));
-      if (repaired != null) found.add(repaired);
+      _addRepairVariants(found, compact.substring(i, i + 11));
+    }
+
+    if (upper.contains('IFSC')) {
+      final shortMatch = RegExp(
+        r'IFSC\s*[:\s]*([A-Z0-9]{10})(?![A-Z0-9])',
+        caseSensitive: false,
+      ).firstMatch(line);
+      if (shortMatch != null) {
+        final raw = shortMatch.group(1)!.toUpperCase();
+        if (_knownBankPrefixes.contains(raw.substring(0, 4))) {
+          final padded = '${raw.substring(0, 4)}0${raw.substring(4)}';
+          _addRepairVariants(found, padded);
+        }
+      }
     }
 
     return found;
   }
 
-  bool _isAccountLabelLine(String line) {
-    final upper = line.toUpperCase();
-    return AppRegex.accountKeyword.hasMatch(line) ||
-        RegExp(r'^ACC(OUNT|OU)', caseSensitive: false).hasMatch(upper);
+  void _addRepairVariants(Set<String> sink, String raw) {
+    final base = _repairIfsc(raw);
+    if (base != null) sink.add(base);
+    final alt = _repairIfsc(raw, lettersPreferZero: true);
+    if (alt != null) sink.add(alt);
   }
 
-  bool _isLikelyBankPrefix(String prefix) {
-    const blocked = {'ACCO', 'OUNT', 'IFSC', 'STAT', 'BANK', 'CUST', 'NAME'};
-    return !blocked.contains(prefix);
+  bool _isAccountLabelLine(String line) {
+    final upper = line.toUpperCase();
+    return _accountLabelRegex.hasMatch(upper) ||
+        RegExp(r'^ACC(OUNT|OU)', caseSensitive: false).hasMatch(upper);
   }
 
   bool _lineMayContainIfsc(String upper) {
     if (upper.contains('IFSC')) return true;
     if (RegExp(r'[A-Z]{4}0[A-Z0-9]{5}').hasMatch(upper)) return true;
-    // Garbled OCR lines (e.g. `SCSBINQCE6922`) mix letters and digits.
-    return RegExp(r'[A-Z]{4}').hasMatch(upper) && RegExp(r'\d').hasMatch(upper);
+    for (final prefix in _knownBankPrefixes) {
+      if (upper.contains(prefix)) return true;
+    }
+    return false;
   }
 
-  String? _repairIfsc(String raw) {
+  String? _repairIfsc(String raw, {bool lettersPreferZero = false}) {
     if (raw.length < 11) return null;
     final normalised = TextCleaner.normaliseIfsc(raw.substring(0, 11));
-    final tail = normalised.substring(5).split('').map(_ocrToDigit).join();
+    final tail = normalised.substring(5).split('').map((c) {
+      if (lettersPreferZero && (c == 'L' || c == 'I')) return '0';
+      return _ocrToDigit(c);
+    }).join();
     final result = '${normalised.substring(0, 5)}$tail';
     return Validators.isIfscValid(result) ? result : null;
   }
@@ -183,22 +309,34 @@ class PassbookParser {
     String blob, {
     String? ifsc,
   }) {
-    final cifNumbers = _numbersNearKeyword(lines, RegExp(r'\bCIF\b', caseSensitive: false));
+    final cifNumbers = _numbersNearKeyword(
+      lines,
+      RegExp(r'\bCIF\b', caseSensitive: false),
+    );
     final preferred = <String>[];
     final fallback = <String>[];
 
-    final blobAccount = RegExp(
-      r'(?:ACCOUNT|ACC(?:OUNT)?|A\s*/\s*C|ACCOU\w*)\s+NO\s+([A-Z]?\d{9,17})',
-      caseSensitive: false,
-    ).firstMatch(blob) ??
-        RegExp(
-          r'(?:ACCOUNT|ACC(?:OUNT)?|A\s*/\s*C)\s*(?:NO|NUMBER)?\s*[:\s]*([A-Z]?\d{9,17})',
-          caseSensitive: false,
-        ).firstMatch(blob);
-    if (blobAccount != null) {
-      final fixed = _fixAccountDigits(blobAccount.group(1)!);
+    final accountLineMatch = _firstAccountLineMatch(lines);
+    if (accountLineMatch != null) {
+      final fixed = _fixAccountDigits(accountLineMatch);
       if (_isPlausibleAccount(fixed, cifNumbers: cifNumbers, ifsc: ifsc)) {
         preferred.add(fixed);
+      }
+    } else {
+      final blobAccount =
+          RegExp(
+            r'(?:ACCOUNT|ACC(?:OUNT)?|A\s*/\s*C|ACCOU\w*)\s+NO\s+([A-Z]?\d{9,17})',
+            caseSensitive: false,
+          ).firstMatch(blob) ??
+          RegExp(
+            r'(?:ACCOUNT|ACC(?:OUNT)?|A\s*/\s*C)\s*(?:NO|NUMBER)?\s*[:\s]*([A-Z]?\d{9,17})',
+            caseSensitive: false,
+          ).firstMatch(blob);
+      if (blobAccount != null) {
+        final fixed = _fixAccountDigits(blobAccount.group(1)!);
+        if (_isPlausibleAccount(fixed, cifNumbers: cifNumbers, ifsc: ifsc)) {
+          preferred.add(fixed);
+        }
       }
     }
 
@@ -207,11 +345,14 @@ class PassbookParser {
       if (AppRegex.accountExcludeKeyword.hasMatch(line)) continue;
       if (RegExp(r'\bCIF\b', caseSensitive: false).hasMatch(line)) continue;
 
-      final nearKeyword = AppRegex.accountKeyword.hasMatch(line) ||
-          (i > 0 && AppRegex.accountKeyword.hasMatch(lines[i - 1]));
+      final nearKeyword =
+          _accountLabelRegex.hasMatch(line) ||
+          (i > 0 && _accountLabelRegex.hasMatch(lines[i - 1]));
 
       for (final n in _accountDigitsFromLine(line)) {
-        if (!_isPlausibleAccount(n, cifNumbers: cifNumbers, ifsc: ifsc)) continue;
+        if (!_isPlausibleAccount(n, cifNumbers: cifNumbers, ifsc: ifsc)) {
+          continue;
+        }
         (nearKeyword ? preferred : fallback).add(n);
       }
     }
@@ -221,13 +362,25 @@ class PassbookParser {
     return null;
   }
 
+  String? _firstAccountLineMatch(List<String> lines) {
+    for (final line in lines) {
+      if (RegExp(r'\bCIF\b', caseSensitive: false).hasMatch(line)) continue;
+      if (!_accountLabelRegex.hasMatch(line)) continue;
+      final match = RegExp(
+        r'([A-Z]?\d{9,17})',
+        caseSensitive: false,
+      ).firstMatch(line);
+      if (match != null) return match.group(1);
+    }
+    return null;
+  }
+
   Set<String> _numbersNearKeyword(List<String> lines, RegExp keyword) {
     final numbers = <String>{};
     for (var i = 0; i < lines.length; i++) {
       if (!keyword.hasMatch(lines[i])) continue;
       numbers.addAll(_accountDigitsFromLine(lines[i]));
-      if (i + 1 < lines.length &&
-          !AppRegex.accountKeyword.hasMatch(lines[i + 1])) {
+      if (i + 1 < lines.length && !_accountLabelRegex.hasMatch(lines[i + 1])) {
         numbers.addAll(_accountDigitsFromLine(lines[i + 1]));
       }
     }
@@ -241,7 +394,9 @@ class PassbookParser {
       results.add(match.group(0)!);
     }
 
-    for (final match in RegExp(r'[A-Z]?\d{9,17}').allMatches(line.toUpperCase())) {
+    for (final match in RegExp(
+      r'[A-Z]?\d{9,17}',
+    ).allMatches(line.toUpperCase())) {
       final fixed = _fixAccountDigits(match.group(0)!);
       if (fixed.length >= 9 && fixed.length <= 18) results.add(fixed);
     }
@@ -354,31 +509,43 @@ class PassbookParser {
   }
 
   String? _extractBranch(List<String> lines) {
-    final candidates = <String>[];
+    final candidates = <_RankedCandidate>[];
 
     for (var i = 0; i < lines.length; i++) {
       final line = lines[i];
       if (!line.toUpperCase().contains('BRANCH')) continue;
 
       final match = RegExp(r'BRANCH', caseSensitive: false).firstMatch(line)!;
-      final after = line.substring(match.end).replaceFirst(RegExp(r'^[:\-\s]+'), '').trim();
+      final after = line
+          .substring(match.end)
+          .replaceFirst(RegExp(r'^[:\-\s]+'), '')
+          .trim();
       final before = line.substring(0, match.start).trim();
 
-      if (after.length > 3) candidates.add(after);
-      if (before.length > 3) candidates.add('$before BRANCH');
+      if (after.length > 3) candidates.add(_RankedCandidate(after, i));
+      if (before.length > 3) {
+        candidates.add(_RankedCandidate('$before BRANCH', i));
+      }
 
       if (i + 1 < lines.length) {
         final next = lines[i + 1].trim();
         if (next.isNotEmpty && !RegExp(r'\d').hasMatch(next)) {
-          candidates.add(next);
+          candidates.add(_RankedCandidate(next, i + 1));
         }
       }
     }
 
     if (candidates.isEmpty) return null;
 
-    candidates.sort((a, b) => _branchRank(b).compareTo(_branchRank(a)));
-    return candidates.first;
+    // On equal rank, prefer the later occurrence — passbook footers tend to
+    // repeat the branch name in cleaner type than the noisy header (e.g.
+    // "KELGACHTA" vs "KULGACHIA").
+    candidates.sort((a, b) {
+      final rankDiff = _branchRank(b.value).compareTo(_branchRank(a.value));
+      if (rankDiff != 0) return rankDiff;
+      return b.position.compareTo(a.position);
+    });
+    return candidates.first.value;
   }
 
   int _branchRank(String name) {
@@ -387,7 +554,9 @@ class PassbookParser {
     if (upper.contains('BRANCH')) rank += 4;
     if (name.length <= 30) rank += 3;
     if (!RegExp(r'\d').hasMatch(name)) rank += 2;
-    if (upper.contains('VILL') || upper.contains(' PO ') || upper.contains('P.O')) {
+    if (upper.contains('VILL') ||
+        upper.contains(' PO ') ||
+        upper.contains('P.O')) {
       rank -= 6;
     }
     return rank;
@@ -417,4 +586,10 @@ class PassbookParser {
         return char;
     }
   }
+}
+
+class _RankedCandidate {
+  const _RankedCandidate(this.value, this.position);
+  final String value;
+  final int position;
 }

@@ -135,12 +135,12 @@ Account No: 37150529313
 Customer Name: Mr. SOUMEN RUIDAS
 S/D/W/H/c: BHOLANATH RUIDAS
 Branch Name: KULGACHIA BRANCH
-IFSC: SBIN0001692
+IFSC: SBIN0006922
 MICR: 700002112
 ''');
       expect(result.accountHolder, 'SOUMEN RUIDAS');
       expect(result.accountNumber, '37150529313');
-      expect(result.ifsc, 'SBIN0001692');
+      expect(result.ifsc, 'SBIN0006922');
       expect(result.isIfscValid, isTrue);
       expect(result.bankName, contains('STATE BANK'));
       expect(result.branch, contains('KULGACHIA'));
@@ -152,6 +152,50 @@ CIF No: 89961440164
 Account No: 37150529313
 ''');
       expect(result.accountNumber, '37150529313');
+    });
+
+    test(
+        'pairs stacked labels with stacked values (CIF label, Account label, '
+        'CIF value, Account value)', () {
+      // ML Kit often returns the left column as labels-first then
+      // values-first (two stacked runs). The parser must pair them
+      // positionally, not attach the first value to the Account label.
+      final result = parser.parsePassbook('''
+STATE BANK OF INDIA
+CIF No
+Account No
+89961440164
+37150529313
+Customer Name: Mr. SOUMEN RUIDAS
+KULGACHIA BRANCH
+IFSC:SBIN0006922
+''');
+      expect(result.accountNumber, '37150529313');
+      expect(result.accountNumber, isNot('89961440164'));
+      expect(result.ifsc, 'SBIN0006922');
+    });
+
+    test('prefers a real IFSC over any value built from the branch code', () {
+      // The visible "Branch Code" in the passbook does NOT necessarily
+      // match the IFSC suffix. The parser should rely on the IFSC text in
+      // the OCR, not synthesise one from the branch code digits.
+      final result = parser.parsePassbook('''
+STATE BANK OF INDIA
+Branch Code:1692
+IFSC:SBIN0006922
+''');
+      expect(result.ifsc, 'SBIN0006922');
+    });
+
+    test(
+        'does not fabricate an IFSC from non-bank 4-letter prefixes plus '
+        'branch code', () {
+      final result = parser.parsePassbook('''
+Address: VILL-MANIKPUR, P.O-KULGACHIA
+Branch Code:1692
+''');
+      // No real IFSC in the text → must return null, not e.g. "ADDR0001692".
+      expect(result.ifsc, isNull);
     });
   });
 

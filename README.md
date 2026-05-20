@@ -22,16 +22,17 @@ Use these bundled samples when reviewing or testing without a physical card/pass
 
 | Asset | Path | Use |
 | ----- | ---- | --- |
-| App walkthrough | `assets/demo/ocr_interview_assignment.mp4` | End-to-end flow (card + passbook) |
+| App walkthrough | `assets/demo/ocr_interview_assignment.mp4` | End-to-end flow — [watch on GitHub](https://github.com/RajDonga09/OCR-Scanner-Interview-Assignment/raw/main/assets/demo/ocr_interview_assignment.mp4) |
 | Debit card | `assets/demo/debit-card-sample.png` | Card scanner — gallery/crop/OCR |
 | Passbook | `assets/demo/passbook-sample.png` | Passbook scanner — gallery/crop/OCR |
 
 ### Walkthrough video
 
-<video src="assets/demo/ocr_interview_assignment.mp4" width="640" controls>
-  Your browser does not support the video tag.
-  <a href="assets/demo/ocr_interview_assignment.mp4">Download demo video</a>
-</video>
+GitHub README cannot play embedded MP4. Click the thumbnail to open the walkthrough in your browser (or download from the repo).
+
+[![Watch app walkthrough — card & passbook OCR demo](assets/demo/demo-thumbnail.png)](https://github.com/RajDonga09/OCR-Scanner-Interview-Assignment/raw/main/assets/demo/ocr_interview_assignment.mp4)
+
+**[▶ Watch walkthrough (MP4)](https://github.com/RajDonga09/OCR-Scanner-Interview-Assignment/raw/main/assets/demo/ocr_interview_assignment.mp4)**
 
 ### Sample images
 
