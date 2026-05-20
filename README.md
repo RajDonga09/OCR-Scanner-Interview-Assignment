@@ -28,7 +28,7 @@ Use these bundled samples when reviewing or testing without a physical card/pass
 
 ### App walkthrough
 
-![OCR Scanner — card and passbook scan demo](assets/demo/ocr_interview_assignment.gif)
+![OCR Scanner — card and passbook scan demo](assets/demo/ocr_interview_assignment-1.gif)
 
 ### Sample images
 
